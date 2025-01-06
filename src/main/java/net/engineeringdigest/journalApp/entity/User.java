@@ -28,4 +28,6 @@ public class User {
     //is se ab link bn gya between user and JournalEntry
     @DBRef
     private List<JournalEntry> journalEntries = new ArrayList<>();
+
+    private List<String> roles;
 }

@@ -1,10 +1,13 @@
 package net.engineeringdigest.journalApp.controller;
 
 import net.engineeringdigest.journalApp.entity.User;
+import net.engineeringdigest.journalApp.repository.UserRepository;
 import net.engineeringdigest.journalApp.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,29 +23,39 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @GetMapping
-    public List<User> getUser(){
-        return userService.getAll();
-    }
+    @Autowired
+    private UserRepository userRepository;
 
-    @PostMapping
-    public boolean saveUser(@RequestBody User newUser){
-        userService.saveEntry(newUser);
-        return true;
-    }
 
-    @PutMapping("{userName}")
-    public ResponseEntity<?> updateUser(@RequestBody User myUser , @PathVariable String userName){
+    @PutMapping
+    public ResponseEntity<?> updateUser(@RequestBody User myUser){
+
+        //is line ka mtlb h ki user verify hogya ki usne sahi userName and password dala h
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        //ye us verified user ka userName ladega
+        String userName = authentication.getName();
+
         User userInDB = userService.findByUserName(userName);
 
         if(userInDB != null){
             userInDB.setUserName(myUser.getUserName());
             userInDB.setPassword(myUser.getPassword());
 
-            userService.saveEntry(userInDB);
+            userService.saveNewEntry(userInDB);
 
             return new ResponseEntity<>(userInDB , HttpStatus.OK);
         }
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @DeleteMapping
+    public ResponseEntity<?> deleteUser(@RequestBody User myUser){
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userName = authentication.getName();
+
+        userRepository.deleteByUserName(userName);
+
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 

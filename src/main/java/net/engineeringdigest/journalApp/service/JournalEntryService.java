@@ -61,15 +61,26 @@ public class JournalEntryService {
         return journalEntryRepository.findById(inputId);
     }
 
-    public void deleteById(ObjectId inputId , String userName){
-        User currUser = userService.findByUserName(userName);
+    @Transactional
+    public boolean deleteById(ObjectId inputId , String userName){
+        boolean removed = false;
+        try {
+            User currUser = userService.findByUserName(userName);
 
-        currUser.getJournalEntries().removeIf(x -> x.getId().equals(inputId)); // for loop shortcut
+            removed = currUser.getJournalEntries().removeIf(x -> x.getId().equals(inputId)); // for loop shortcut
 
-        //same id ka user save kr rhe h jo pehle se db me h
-        //to purane user ki jagah updated user save hojaega
-        userService.saveEntry(currUser);
+            if(removed){
+                //same id ka user save kr rhe h jo pehle se db me h
+                //to purane user ki jagah updated user save hojaega
+                userService.saveEntry(currUser);
 
-        journalEntryRepository.deleteById(inputId);
+                journalEntryRepository.deleteById(inputId);
+            }
+        }
+        catch(Exception e){
+            System.out.println(e);
+            throw new RuntimeException("An error occured while deleting the entry." , e);
+        }
+        return removed;
     }
 }

@@ -21,4 +21,6 @@ public interface UserRepository extends MongoRepository<User, ObjectId> {
 
 //    it will not work the same if you write findByUserName(String userName) in the UserService class. The reason is that Spring Boot’s automatic query method generation only works within repository interfaces (e.g., UserRepository) that extend Spring Data repositories like MongoRepository or CrudRepository.
     User findByUserName(String userName);
+
+    void deleteByUserName(String userName);
 }
