@@ -23,6 +23,7 @@ public class SpringSecurity extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
                 .antMatchers("/journal/**" , "/user/**").authenticated()      // /journal/-- , /user/--  jaise endpoints ko secure krdo
+                .antMatchers("/admin/**").hasRole("ADMIN")       //agr roles List me ADMIN h to hi access milega /admin vale endpoints ka
                 .anyRequest().permitAll()                                   //baki sb request ko permit krdo
                 .and()
                 .httpBasic();
