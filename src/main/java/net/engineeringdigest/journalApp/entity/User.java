@@ -20,6 +20,7 @@ public class User {
     private ObjectId id;
     //@Indexed ke liye application properties me ek line add krni pdti h
     //iski help se searching along userName becomes faster
+    //also same userName ki 2 entries ni hone dega ye
     @Indexed(unique = true)
     @NonNull
     private String userName;
